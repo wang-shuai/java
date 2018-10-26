@@ -1,0 +1,409 @@
+﻿syntax = "proto3";
+
+option java_multiple_files = true;
+
+package TaocheES;
+
+//推荐车源搜索条件实体(用于调用grpc 中查询推荐车源时调用的方法传入的参数)
+message SearchRecommendCondition{
+	int32 PageSize=1;	//获取车源条数[默认为10]
+	int32 RequestSource=2;		//[必填]搜索来源
+	string Position=3;		//[必填]访问位置
+	repeated int32 CarCityIdArray=4;	//城市ID
+	string SearchCondition=5;	//筛选条件
+	int32 IsQueryDsl=6;		//是否需要返回查询语句
+	int32 PageIndex=7;	//页码
+	repeated int32 CarProvinceIdArray=8;	//省份ID
+}
+
+
+//问答数据搜索条件实体(用于调用grpc 中查询问答的方法传入的参数)
+message SearchQuestionCondition{
+	int32 CommonFlag=1;	//全局标识位
+	int32 RequestSource=2;	//访问来源
+	repeated string ReturnFieldArray=3;	//[必填]返回结果集字段,如果不填寫默認只返回 id
+	repeated string OrderByFieldArray=4;	//排序字段(与 IsDESC 同时使用)
+	repeated bool OrderByIsDESCArray=5;	//是否倒序 true desc, false asc(与 OrderByFieldArray 同时使用)
+	int32 SortBoostFlag=6;	//排序标识：0为常规
+	int32 PageSize=7;	//页大小，即需要返回的数据记录条数
+	int32 PageIndex=8;	//当前页码，最大值为500
+	bool IsHightLight=9;	//是否高亮显示
+	bool IsCountSearch=10;	//是否只返回符合条件的记录条数，不返回具体数据
+	string RequestParametersLog=11; //是否返回请求日志：get为返回日志
+	repeated AggrCondition AggrFieldList=12;	//切面聚合检索条件 
+	repeated int32 QoIdArray=101;	//问题ID检索数组
+	repeated int32 NoQoIdArray=102;	//排除问题ID数组
+	string KeyWord=103;	//检索关键词
+	string Title=104;		//标题检索
+	string Body=105;		//提问内容检索
+	string ReplyBody=106;	//最佳答案检索
+	repeated string TagsArray=107;	//标签检索
+	repeated int32 MainBrandIdArray=108;	//主品牌ID数组
+	repeated int32 BrandIdArray=109;		//车系ID数组
+	repeated string CategoriesArray=110;	//问题分类数组
+	repeated string CategoriesGroupArray=111;	//问题分类分组检索
+	repeated int32 AreaIdArray=112;		//地区城市ID等值检索
+	int32 MaxReplyCount=113;	//最大回复数:小于等于N检索
+	int32 MinReplyCount=114;	//最小回复数:大于等于N检索
+	int32 MinViewCount=115;	//最小浏览数：大于等于N检索
+	int32 MaxViewCount=116;	//最大浏览数：小于等于N检索
+	repeated int32 ProvinceIdArray=117;	//省份ID数组
+	repeated int32 CityIdArray=118;		//城市Id数组
+	repeated int32 IsSolveArray=119;	//问题解决状态检索 isSolve(0：未解决，1：已解决(有最佳答案)，2：已关闭)
+	repeated string CutLengthFieldNameArray=120;		//截取字段名数组(要截取的字段名)(与CutLengthFieldValueArray成对出现)
+	repeated int32 CutLengthFieldValueArray=121;		//截取字段长度数组(要截取的字段长度设置)(与CutLengthFieldNameArray 成对出现)
+	repeated string HightLightFieldArray=122;	//高亮返回结果集字段,默认不返回高亮字段
+}
+
+//车源检索条件实体(用于调用grpc 中查询京东车源，cpc车源，一般车时传入的参数)
+message SearchCondition {   //  车源检索条件实体
+	int32 CommonFlag=1;	//全局标识位
+	int32 RequestSource=2;	//访问来源（站点或项目）
+	repeated string ReturnFieldArray=3;	//[必填]返回结果集字段,如果不填寫默認只返回 id.
+	repeated string OrderByFieldArray=4;	//排序字段(与 IsDESC 同时使用)
+	repeated bool OrderByIsDESCArray=5;	//是否倒序 true desc, false asc ;(与 OrderByFieldArray 同时使用)
+	int32 SortBoostFlag=6;	//排序标识：0为常规；1为以boostapp为基础权重，刷新时间权重衰减(Groovy脚本方式)；2为boostapp为基础权重，刷新时间衰减（jar包方式）
+	int32 PageSize=7;	//页大小，即需要返回的数据记录条数
+	int32 PageIndex=8;	//当前页码，最大值为500
+	double DistanceKm=9;	//距离检索：20151201
+	string Location=10;	//当前坐标点，用于按距离筛选或排序：----20151201  数据格式：X,Y，示例：112.124,332.22
+	bool IsCountSearch=11;	//是否只返回符合条件的记录条数，不返回具体数据
+	string RequestParametersLog=12; //是否返回请求日志：get为返回日志
+	repeated AggrCondition AggrFieldList=13;	//切面聚合检索条件
+	int32 StartNum=14;	//起始条数，即跳过前N条数据
+
+	repeated int32 UcarIdArray=101;	//包含车源ID数组【谨慎使用,控制Length】
+	repeated int32 SiteId=102;		//车源数据来源：1	58二手车，2	车168，3	51汽车，4	第一车网，5	淘车网 【默认为5】
+	repeated int32 UcarStatusArray=103;	//车源状态(1为在售,4为售出,100 为查询所有车源)  
+	repeated int32 NoUcarIdArray=104;	//排除车源ID数组【谨慎使用,控制Length】
+	int32 IsAuthenticated=105;		//是否是品牌认证车：-1-未知 0-否 1-是 (厂商认证)
+	int32 Source=106;	//是否可跨区(1为不可跨区,2为可跨区(即全国营销车源)) 
+	repeated int32 UserIdArray=107;	//用户ID(经销商ID)【谨慎使用,控制Length】
+	repeated int32 NoUserIdArray=108;	//排除用户ID(经销商ID)【谨慎使用,控制Length】
+	repeated string UcarSerialNumberArray=109;	//包含车源编号数组【谨慎使用,控制Length】
+	string KeyWord=110;	//搜索关键词
+	repeated string ColorArray=111;	//车辆颜色
+	int32 CarSource1L=112;		//车辆来源（1为个人；2为商家） 
+	int32 PictureCount=113;	//车源图片数量,搜索包含图片最小数量,搜索有图车源时传入1,无图车源传入0,
+	repeated int32 BigAreaIdArray=114;		//大区ID数组【谨慎使用,控制Length】
+	repeated int32 ProvinceIdArray=115;	//车源所在地--省份ID ,注意只有CityIdArray不傳參數時改屬性才生效
+	repeated int32 CityIdArray=116;	//车源所在城市ID
+	repeated int32 NoCityIdArray=117;	//排除车源所在城市ID【谨慎使用,控制Length】
+	repeated int32 RelateCityArray=118;	//周边城市ID
+	repeated double PriceLowerArray=119;	//价格范围--最低价(单位"万") 
+	repeated double PriceHighArray=120;	//价格范围--最高价(单位"万") 
+	repeated double CPriceLowerArray=121;	//厂商指导>价格范围--最低价(单位"万") 
+	repeated double CPriceHighArray=122;	//厂商指导>价格范围--最高价(单位"万") 
+	repeated double B2BPriceLowerArray=123;	//批发价（B2BPrice）-价格范围--最低价(单位"万")  --2016-04-28
+	repeated double B2BPriceHighArray=124;	//批发价（B2BPrice）-价格范围--最高价(单位"万")   --2016-04-28
+	repeated int32 CarAgeLowerArray=125;	//车龄范围--最低值 
+	repeated int32 CarAgeHighArray=126;	//车龄范围--最高值 
+	repeated int32 DrivingMileageLowerArray=127;	//行驶里程--最低值（单位：万公里）
+	repeated int32 DrivingMileageHighArray=128;	//行驶里程--最高值（单位：万公里）
+	int32 SuperiorId=129;	//经销商上级公司ID（即厂商ID）(针对商家车源)
+	int32 UserType=130;	//商家车源来源类型(UserType字段)
+	int32 IsNeglect=131;	//审核状态 0为待审核；1为已审核；2为待复审；-1为暂不审核；-2为暂不复审   
+	int32 IsVideo=132;	//是否包含视频(参数含义：按照数据库中IsVideoCar定义)
+	int32 IsFirstPicTrue=133;	//是否首图确认  -1为不合格；0为待审核；1为首图合格
+	int32 IsDealerRecommend=134;	//是否商家推荐车源
+	repeated int32 CarSourceTypeArray=135;	//车源来源类型  车辆类别(用途)：0-非营运 1-营运 2-营转非 3-租赁
+	repeated int32 CarTypeConfig=136;	//车型配置 ： 010100000110111110 共计18位,将参数转化为18位的数组传入,如果那“一位”不参与查询 设置为-1 ,例如：new int[] { 0, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+	int32 IsRecommendGL=137;	//是否豪车：  1 是
+	int32 IsWarranty=138;	//是否保障车：  1 是 ,默认0(不参与查询)
+	repeated int32 WarrantyTypeArray=139;	//保障服务类型 ： 101 共计3位,将参数转化为3位的数组传入,如果那“一位”不参与查询 设置为-1 ,例如：new int[] { 0, 1, -1};  注：可能会大于3位长度(查询会自适应)  lijunhao 2015-02-26
+	int32 IsTop=140;	//是否置顶车源（车源营销---置顶推广）：  1 是,默认0(不参与查询)
+	int32 IsActivity=141;	//是否参加特定活动的车源：1为参加，0为不参加    --- 20151016 当前：2015年双十一活动,2016年66购车节活动
+	int32 IsBangmai=142;	//是否帮买车源：1为参加，0为不参加    --- 20151208
+	int32 IsBangmaiche=143;	//是否参加淘车的帮买车APP车源：1为参加，0为不参加    --- 20160217
+	int32 IsShowMr=144;	//是否显示维保记录：1为显示，0为不显示    --- 20160202
+	int32 IsCarId=145;	//是否包含车型ID，即车型ID是否大于0    ----2016-02-22
+	int32 IsB2B=146;	//是否B2B串车车源：1为是  ----20160413
+	repeated int32 CrmCustomerIdArray =147;	//客户编号数组检索
+	int32 IsCheckReportJson=148;	//是否显示车源质检报告
+
+
+	repeated int32 EnvirStandardArray=149;	//排放标准：1:国2, 2:国3, 3:国4, 4:国5, 5:欧3, 6:欧4, 7:欧5, 8:京5, 9:OBD   ---  20150629  用0,1设置搜索条件，如“0,0,0,1,0,0,0,0,1” 代表 “国5或OBD”
+	repeated double ConsumptionLowerArray=150;	//综合工况油耗>范围--最低(单位"升/百公里")    ---- 20140828
+	repeated double ConsumptionHighArray=151;	//综合工况油耗>范围--最高(单位"升/百公里")    ---- 20140828
+	repeated int32 OilTypeArray=152;	//能源类型：OilTypeEnum   ---  20150828
+	repeated int32 EngineLocationArray=153;	//发动机位置：EngineLocationEnum   ---  20150828
+	repeated int32 BodyDoorsLowerArray=154;	//车门数--最低值（单位：个）    ---  20150828
+	repeated int32 BodyDoorsHighArray=155;	//车门数--最高值（单位：个）    ---  20150828
+	repeated int32 SeatNumLowerArray=156;	//座位数/乘员人数--最低值（单位：个）    ---  20150828
+	repeated int32 SeatNumHighArray=157;	//座位数/乘员人数--最高值（单位：个）    ---  20150828
+	int32 IsWagon=158;	//是否旅行版：1是    ---  20150828
+	repeated int32 DriveTypeArray=159;	//驱动方式：DriveTypeEnum   ---  20150901
+	repeated int32 CsBodyFormArray=160;	//车身形式：CsBodyFormEnum   ---  20150907
+	repeated int32 CarLevelArray=161;	//车辆类型数组(豪华车 = 1,微型车 = 2,中大型车 = 3,小型车 = 4,MPV = 5,中型车 = 6,紧凑型车 = 7,SUV = 8,跑车 = 9,其他 = 10,面包车 = 11,皮卡 = 12,概念车=13,客车=14,卡车=15)
+	repeated int32 CarLevelSecondArray=162;	//车系二级级别  0:无,1:小型suv,2:紧凑型suv,3:中型suv,4:中大型suv,5:全尺寸suv,6:微客,7:小客,8:中客,9:大客,10:微卡,11:轻卡,12:中卡,13:重卡
+	repeated string CarYearArray=163;	//车型年款
+	repeated int32 MainBrandArray=164;	//搜索主品牌(mainbrandid)数组【谨慎使用,控制Length】
+	repeated int32 BrandArray=165;	//搜索品牌(producerid)数组【谨慎使用,控制Length】
+	repeated int32 CarSerialArray=166;	//搜索车系(brandid)数组【谨慎使用,控制Length】
+	repeated int32 CarIDArray=167;	//搜索车型数组【谨慎使用,控制Length】
+	repeated int32 GearBoxTypeArray=168;	//变速箱
+	repeated double ExhaustLevelLowerArray=169;	//排气量--最低值(参数名称为exhaustlower)
+	repeated double ExhaustLevelHighArray=170;	//排气量--最高值
+	repeated int32 ExhaustLevelArray=171;	//1.0升以下、1.1-1.5升、1.6-2.0升、2.1-3.0升、3.1升以上 （2014-03-03）
+	repeated int32 CountryArray=172;	//品牌国别(参数名称为country)按枚举值进行检索：澳大利亚 = 1, 德国 = 2, 法国 = 3, 韩国 = 4,荷兰 = 5, 捷克 = 6, 美国 = 7, 日本 = 8, 瑞典 = 9, 西班牙 = 10, 意大利 = 11, 英国 = 12, 中国 = 13
+	repeated int32 BrandAttrArray=173;	// 品牌属性(自主 = 1, 合资 = 2, 进口 = 3)
+	
+	int32 AdCity=174;	//精准广告投放城市
+	int32 AdCondition=175;		//精准广告投放条件
+
+	double CarBenefitRateLower=176;	//车源优惠超值系数--最低值
+	double CarBenefitRateHigh=177;	//车源优惠超值系数--最高值 
+	double CallConnectRateLower=178;	//商家7天内电话接通率--最低    ---- 20170329
+	double CallConnectRateHigh=179;	//商家7天内电话接通率--最高    ---- 20170329
+
+	repeated string VinCodeArray=180;		//VIN码查询  --20170329
+
+	repeated int32 LicenseProvinceIdArray=181;	//车牌所在地--省份ID ,注意只有LicenseCityIdArray为空时才生效
+	repeated int32 LicenseCityIdArray=182;	//车牌所在城市ID  2017-04-10
+
+	int32 IsLicensed=183;	//是否上牌：1:已上牌,-1:未上牌,0:不参与查询
+	repeated int32 NoCrmCustomerIdArray=184;	//排除客户编号数组检索
+
+	int32 CarPvMin=185;	//车源前7天最小PV数
+	int32 CarPvMax=186;	//车源前7天最大PV数
+
+	repeated int32 NoSuperiorIdArray=187;	//排除经销商上级公司ID（即厂商ID）(针对商家车源)
+	int32 IsDealerAuthorized=188;	//是否淘车认证车：1为是，-1为否，0为不限制
+
+	repeated double LoanFirstPayLowerArray=189;	//首付款金额范围--最低价(单位"元") 
+	repeated double LoanFirstPayHighArray=190;	//首付款金额范围--最高价(单位"元") 
+	repeated double LoanDailyPayLowerArray=191;	//日还款金额范围--最低价(单位"元") 
+	repeated double LoanDailyPayHighArray=192;	//日还款金额范围--最高价(单位"元") 
+	repeated double LoanMonthPayLowerArray=193;	//月还款金额范围--最低价(单位"元") 
+	repeated double LoanMonthPayHighArray=194;	//月还款金额范围--最高价(单位"元") 
+
+	repeated int32 DistrictIdArray=195;	//车源所在区县Id 20170825
+
+	repeated int32 InhaleTypeArray=196;	//进气方式Id 20170825
+
+}
+
+//聚合检索查询条件
+message AggrCondition{
+	string FieldName=1;		//聚合字段名称
+	int32 TopNumber=2;		//聚合结果top数量
+	int32 AggregationType=3;	//聚合类型：Term = 1,Range = 2
+	string RangeConfig=4;		//范围聚合区间值定义
+	repeated string SubKeyFieldArray=10;		//二次聚合字段名称（聚合结果中返回的字段名）
+	repeated string SubValueFieldArray=11;	//二次聚合值字段名称（即基于此字段的值进行二次聚合）
+	repeated string SubAggrTypeArray=12;		//二次聚合类型：stats、max、min、sum、avg
+	repeated string OrderFieldArray=13;		//排序字段：支持多字段排序，与OrderType一一对应
+	repeated string OrderTypeArray=14;		//排序方向：asc、desc
+}
+
+//搜索推荐车源的结果
+message SearchRecommendResult{
+	int64 Count=1;	//搜索结果总记录条数
+	string CarJson=2;	//搜索结果车源json串
+	string QueryDsl=3;	//查询语句
+}
+
+//搜索结果返回对象
+message SearchResult {
+  repeated DTOCarInfoIndexField CarList=1;	//返回车源集合
+  repeated AggrFieldResult Facet=2;	//切面聚合信息
+  repeated DTOQuestionIndexField QuestionList=3;	//返回问答数据集合
+  int64 Count=4;	//搜索结果总记录条数
+  string Message=5;	//异常信息返回
+  string RequestParametersLog=6;	//请求参数string 化, RequestParametersLog="get" 将返回请求参数集合.
+  repeated int32 StepCount=7;	//分步检索时，每一步的记录条数
+  int64 TotalElapsedMilliseconds=8;	//总耗时
+}
+
+//聚合字段结果返回对象
+message AggrFieldResultItem{
+	string TermName=1;		//聚合结果项名称
+	int32 Count=2;	//数据条数
+	map<string,string> SubAggr=3;	//二级聚合结果集合
+}
+
+//聚合字段结果
+message AggrFieldResult{
+	string FieldName=1;		//聚合字段名称
+	int32 AggrType=2;		//字段类型：Term = 1,Range = 2
+	repeated AggrFieldResultItem AggrValue=3;	//聚合结果
+}
+
+//  问答实体
+message DTOQuestionIndexField {   
+	int32 qoid=1;		//问题ID
+	string title=2;	//标题
+	string body=3;		//问题内容
+	int32 areaid=4;	//问题所在大区
+	string areatype=5;	//大区类型
+	string areaname=6;	//大区名称
+	int32 replycount=7;	//回复次数
+	int32 viewcount=8;	//浏览次数
+	int32 active=9;	//问题状态
+	string categories=10;	//分类
+	string tags=11;		//标签
+	string replybody=12;	//最佳答案
+	int32 lastreplyusertype=13;	//最后修改人类型
+	int32 lastreplyuserid=14;		//最后回复人ID
+	int32 masterbrandid=15;	//主品牌ID
+	int32 brandid=16;	//品牌
+	string brandname=17;	//品牌名称
+	int32 pvcid=18;	//省份ID
+	string pvcname=19;	//省份名称
+	int32 cityid=20;	//城市ID
+	string cityname=21;	//城市名称
+	int32 userid=22;		//提问人用户ID
+	string username=23;	//提问人用户名称
+	int32 usertype=24;	//提问人用户类型
+	int32 issolve=25;		//解决状态
+	int32 status=26;		//问题状态
+	string brandspell=27;	//车系拼音
+	string catespell=28;	//分类拼音
+	string categroup=29;	//分类分组
+	string createtime=30;	//提问时间
+	string lastmodifytime=31;	//最后修改时间
+	string lastreplytime=32;	//最后回复时间
+	int32 id=33;	//id
+	string fullinfo=34;	//描述信息
+}
+
+//  车源实体
+message DTOCarInfoIndexField { 
+  int32 ucarid=1; //  车源ID
+  string ucarserialnumber=2; //  车源编号
+  int32 ucarstatus=3;  //  车源状态
+  int32 carproviceid=4; //  车源所在地省份
+  int32 carcityid=5;  //  车源所在城市
+  string color=6; //  车源颜色
+  int32 drivingmileage=7; //  行驶里程(单位：公里)
+  int32 completerate=8; //  资料完整度
+  int32 carsource1l=9; //  车辆来源1级分类(1: 个人 2：商家)
+  int32 isvideo=10; //  是否视频车源(-2视频删除, -1视频不合格, 0无视频, 1为待审核, 2视频合格 )
+  int32 firstpictrue=11; //  首图是否确认合格
+  int32 cartype=12; //  车辆用途(用途 0:非营运;1:营运;2:营转非;3:租赁;)
+  int32 source=13; //  商家车源是否可跨区(1是不可跨区 2是可跨区)
+  int32 isneglect=14; //  车源审核状态：0为未审核；1为已审核；2为待复审；
+  int32 picturecount=15; //  是否有图：1为有图；0为无图 
+  int32 picturenumber=16; //  图片数量
+  double displayprice=17; //  显示价格(单位：万元)
+  string statusmodifytime=18; //  状态更改时间
+  string createtime=19; //  创建时间
+  string buycardate=20; //  原始购车日期
+  string carpublishtime=21; //  车辆发布时间
+  string ucarpicwholepath=22; //  车源首图
+  int32 isdealerrecommend=23; //  是否是商家推荐车源
+  int32 isauthenticated=24; //  是否是厂商认证车
+  int32 isrecommendgl=25; //  是否豪车
+  int32 isowncar=26; //  是否自有车源
+  double c2bprice=27; //  车源评估价-精真估,用于计算车源权重（价格合理度）
+  int32 istop=28; //  是否置顶车源 1为是，0或空为否
+  string statedescription=29; //  车况描述
+  int32 iswarranty=30; //  是否保障车
+  string warrantytypes=31; //  保障服务类型
+  int32 isshowmr=32; //  是否显示维保记录
+  string carprovincename=33; //  车源所在省份名称
+  string carcityname=34; //  车源所在城市名称
+  int32 cardistrictid=35; //  车源所在区县ID
+  string cardistrictname=36; //  车车源所在区县名称
+  string slogan=37; //  广告语（商家推荐）
+  double b2bprice=38; //  B2B串车价格：20160331
+  int32 isb2b=39; //  isb2b
+  int32 mainbrandid=40; //  主品牌Id
+  int32 producerid=41; //  所属品牌Id
+  string country=42; //  品牌所属国籍
+  int32 brandid=43; //  说明:车系ID
+  string carlevel=44; //  车辆类型（级别）
+  int32 carlevelvalue=45; //  车辆类型（级别）枚举值
+  int64 carid=46; //  车型ID
+  int32 gearboxtype=47; // 变速箱类型
+  string gearboxtypestring=48; //  搜索无效，仅用于创建索引
+  double exhaustvalue=49; //  排气量数值
+  int32 caryear=50; //  车型年款的年份
+  double carreferprice=51; //  新车厂商指导价(单位：万元)
+  string envirstandard=52; //  排放标准：{ "国2", "国3", "国4", "国5", "欧3", "欧4", "欧5", "京5", "OBD" }
+  double consumption=53; //  综合工况油耗
+  int32 oiltype=54; //  能源类型：柴油、CNG、待查、油气混合动力、NULL、汽油、LPG、油电混合动力、电力
+  int32 enginelocation=55; //  发动机位置 中置、待查、NULL、前置、后置
+  int32 bodydoors=56; //  车门数
+  int32 seatnummin=57; //  最少座位数
+  int32 seatnummax=58; //  最多座位数
+  int32 iswagon=59; //  是否旅行版
+  int32 drivetype=60; //  驱动方式 -1 待查 0前轮驱动 1 后轮驱动 2 全时四驱 3 分时四驱4适时四驱
+  int32 isagency=61; //  是否中介商家
+  int32 csbodyform=62; //  车系--车身形式 待查 = -1,两厢轿车 = 0,三厢轿车 = 1,Wagon旅行车 = 2,Pickup皮卡 = 3,MPV = 4,Cross混型车 = 5,跑车 = 6,MicroBus厢式车 = 7,SUV = 8,其他 = 9
+  int32 brandattr=63; //  品牌属性：自主、合资、进口       
+  int32 ismarkingvendor=64; //  是否屏蔽商家：针对虚假商家，做特殊处理，车源不下架，但是不显示在车源列表页   
+  int32 countryvalue=65; //  国别的value值（CountryEnum），用于快速检索      
+  int32 userid=66; //  [商家车源]经销商ID|[个人车源]注册用户ID</para>              
+  int32 superiorid=67; //  [商家车源]经销商分类ID（上级公司ID，即厂商ID）</para>        
+  string vendorname=68; //  [商家车源]经销商简称</para>      
+  int32 vendortype=69; //  [商家车源]经销商类型         
+  string contact=70; //  联系电话         
+  int32 isjdvendor=71; //  是否是京东招商商家        
+  int32 isinctransfer=72; //  是否包含过户费：1为含过户费；0为不含过户费   
+  int32 usertype=73; //  车辆来源
+  int32 isactivity=74; //  是否参加特定活动的车源：20151015:2015年双十一活动201604:2016年66购车节活动
+  int32 membertype=75; //  会员版本：0为免费版；10为付费版；20为试用版
+  int32 isbangmai=76; //  是否帮买车源：1为是，0为否  2015-12-07
+  int32 dvqflag=77; //  是否有资质：1为是，0为否  2016-02-17
+  int32 isbangmaiche=78; //  是否参加帮买车app车源：1为是，0为否  2016-02-17
+  string baidumap=79; //  百度地图坐标点，冗余，用于返回值
+  double distance=80; //  距离值，适用于地理位置检索和排序  2016-03-25
+  string linkman=81; //  第一联系人名称
+  string cartypeconfig=82; //  车型配置
+  int32 siteid=83; //  车源数据来源(1 58二手车，2 车168，351汽车，4 第一车网，5 淘车网)
+  string cartitle=84; //  车源标题
+  int32 carlevelsecond=85; //车辆二级级别(Car_Serial.ModelLevelSecond)
+  int32 ischeckreportjson=86;  //是否显示json车检报告  2016-07-07
+  int64 clickcount=87; //  车源7天内点击量：20160429
+  int32 crmcustomerid=88;	//客户编号：2016-09-30
+  double boost=89; //  车源基本权重
+  double boostc=90; //  可控资源权重，即各车源区块、对外推广等
+  double boostapp=91; //  app权重，实时评分机制
+  double score=92;	//得分
+  double costrate=93;	//成本比值=经销商千次币成本/城市平均千次币成本
+  int32 id=94;			//索引ID
+  int32 iscpc=95;		//是否CPC车源
+  double callnodeviationrate=96;		//会员本季度电话量平均差值系数
+  double carbenefitrate=97;		//车源超值系数【车源售价/(新车指导价+购置税)】
+  double callconnectrate=98;	//经销商近7天接通率 2017-03-30
+  string vincode=99;		//VIN码 2017-03-30
+  double lastprice=100;		//历史价格 2017-03-30
+  string pricechangetime=101;	//上次价格修改时间 2017-03-30
+  int32 licensecityid=102;		//车牌所在城市 2017-04-10
+  int32 licenseproviceid=103;		//车牌所在省份 2017-04-10
+  int32 islicensed=104;		//是否上牌 2017-04-11
+  int32 isdealerauthorized=105;		//是否淘车认证车 2017-07-26
+  double loanfirstpay=106;		//贷款首付额 2017-07-26
+  double loandailypay=107;		//贷款日还款额 2017-07-26
+  double loanmonthpay=108;		//贷款月还款额 2017-07-26
+
+  string insuranceexpiredate=109;   //保险有效期 2017-11-29
+
+  int32 warrantytypes_1=201; //  保障服务类型明细
+  int32 warrantytypes_2=202; //  保障服务类型明细
+  int32 warrantytypes_3=203; //  保障服务类型明细
+
+  int32 envirstandard_1=204; //  环保标准明细
+  int32 envirstandard_2=205; //  环保标准明细
+  int32 envirstandard_3=206; //  环保标准明细
+  int32 envirstandard_4=207; //  环保标准明细
+  int32 envirstandard_5=208; //  环保标准明细
+  int32 envirstandard_6=209; //  环保标准明细
+  int32 envirstandard_7=210; //  环保标准明细
+  int32 envirstandard_8=211; //  环保标准明细
+  int32 envirstandard_9=212; //  环保标准明细
+  int32 inhaletype=213;      //  进气方式（-1：待查；0：自然吸气；1：涡轮增压；2：机械增压；3：双增压）
+  double boostnew=214;		//  新车源权重，评分机制
+  int32 showposition=215;   //  本地推荐显示位置 2018-08-23
+
+}
+
+//grpc 服务
+service TaocheESService { 
+  rpc SearchTaocheCar (SearchCondition) returns (SearchResult){};
+  rpc SearchJDCar (SearchCondition) returns (SearchResult){};
+  rpc SearchCPCCar (SearchCondition) returns (SearchResult){}
+  rpc SearchQuestion (SearchQuestionCondition) returns (SearchResult){};
+  rpc SearchRecommendCar (SearchRecommendCondition) returns (SearchRecommendResult){};
+}
