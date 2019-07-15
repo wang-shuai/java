@@ -6,9 +6,9 @@
 		<groupId>com.example</groupId>
 		<artifactId>dubbo-demo</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath>../pom.xml</relativePath>
 	</parent>
-	<groupId>com.example</groupId>
+	<!--<groupId>com.example</groupId>-->
 	<artifactId>dubbo-provider</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>dubbo-provider</name>
