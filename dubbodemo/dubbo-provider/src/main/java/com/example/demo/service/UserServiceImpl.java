@@ -14,7 +14,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public User saveUser(User user) {
         user.setId(1);
-        user.setName("shine");
+//        user.setName("shine");
         System.out.println("saveUser:" + user.toString());
         return user;
     }
