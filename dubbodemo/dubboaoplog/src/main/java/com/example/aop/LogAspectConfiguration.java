@@ -13,11 +13,11 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @Configurable
 @AutoConfigureOrder
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-@ConditionalOnClass(ClogAspect.class)
-@ConditionalOnMissingBean(ClogAspect.class)
-public class ClogAspectConfiguration {
+@ConditionalOnClass(LogAspect.class)
+@ConditionalOnMissingBean(LogAspect.class)
+public class LogAspectConfiguration {
     @Bean
-    public ClogAspect getClogAspect(){
-        return new ClogAspect();
+    public LogAspect getClogAspect(){
+        return new LogAspect();
     }
 }

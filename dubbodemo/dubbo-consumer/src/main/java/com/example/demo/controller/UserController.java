@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Created by wangshuai on 2019/5/23.
+ *
+ * @author wangshuai
+ * @date 2019/5/23
  */
 @RestController
 public class UserController {
