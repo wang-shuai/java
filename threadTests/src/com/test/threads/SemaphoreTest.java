@@ -1,5 +1,6 @@
 package com.test.threads;
 
+import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.*;
 
@@ -31,18 +32,26 @@ public class SemaphoreTest implements Runnable {
         }
         System.out.println("main thread is waitting " + semaphore.availablePermits());
 
-        TimeUnit.SECONDS.sleep(8);
+//        TimeUnit.SECONDS.sleep(8);
         executorService.shutdown();
-        System.out.println("all thread executed " + semaphore.availablePermits());
 
-        System.exit(1);
+        while (true) {//等待所有任务都执行结束
+            if (executorService.isTerminated()) {//所有的子线程都结束了
+                System.out.println("all thread executed " + semaphore.availablePermits());
+                break;
+            }
+        }
+
+
+//        System.exit(1);
     }
 
+    @Override
     public void run() {
         try {
             semaphore.acquire();
             System.out.println(index + " get permit");
-            Thread.sleep(new Random().nextInt(2000));
+            Thread.sleep(new Random(System.currentTimeMillis()).nextInt(200));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }finally {
